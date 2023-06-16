@@ -1,38 +1,73 @@
 
+import React, { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+
+
+import { Container, ToDoList, Input, Button, ListItem, Trash, Check, Title } from './style.js'
+
+
+
+
 function App() {
-  const list = [
-    {id:uuid(), task: "Treinar na academia"},
-    {id:uuid(), task: "Estudar na DevClub"}
-]
+  const [list, setList] = useState([])
+  const [inputTask, setInputTask] = useState('')
 
-    function inputChange(event) {
-      console.log(event.target.value)
-    }
+  function inputChange(event) {
+    setInputTask(event.target.value)
+  }
 
-    function buttonClick(){
-      console.log("Cliquei no botão")
+  function buttonClick() {
+    if(inputTask){
+      setList([...list, { id: uuid(), task: inputTask, finished: false }])
     }
+   
+  }
+
+  function endTask(id) {
+
+    const newList = list.map(item => (
+      item.id === id ? { ...item, finished: !item.finished } : item
+    ))
+
+    setList(newList)
+
+  }
+
+  function deleteItem(id) {
+    const newList = list.filter(item => item.id !== id)
+
+    setList(newList)
+  }
 
 
 
   return (
-    <div>
-      <input onChange={inputChange} placeholder="O que tenho que fazer..." />
-      <button onClick={buttonClick}>Adicionar</button>
+    <Container>
+      <ToDoList>
+        <Input onChange={inputChange} placeholder="O que tenho que fazer..." />
+        <Button onClick={buttonClick}>Adicionar</Button>
 
-      <ul>
-        {
-          list.map( item =>(
-            <li key={item.id}>{item.task}</li>
-          ))
-        }
-      </ul>
+        <ul>
+          {
+            list.length > 0 ? (
+              list.map((item) => (
+                <ListItem isFinished={item.finished} key={item.id}>
+                  <Check onClick={() => endTask(item.id)} />
+                  <li>{item.task}</li>
+                  <Trash onClick={() => deleteItem(item.id)} />
+                </ListItem>
+              ))
+            ) : (
+              <Title>Não há tarefas na lista</Title>
+            )
+          }
 
-    </div>
+        </ul>
+      </ToDoList>
+    </Container>
 
   )
 }
 
-export default App
+export default App  
